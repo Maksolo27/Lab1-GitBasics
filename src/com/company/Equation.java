@@ -20,11 +20,9 @@ public class Equation {
             double x;
             x = -b / (2 * a);
             results.add(x);
-            System.out.println("Уравнение имеет единственный корень: x = " + x);
             return results;
         }
         else {
-            System.out.println("Уравнение не имеет действительных корней!");
             return results;
         }
     }
