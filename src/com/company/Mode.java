@@ -1,5 +1,5 @@
 package com.company;
 
 public enum Mode {
-    INTERACTIVE, NONINTERACTIVE;
+    NONINTERACTIVE, INTERACTIVE, ALL;
 }

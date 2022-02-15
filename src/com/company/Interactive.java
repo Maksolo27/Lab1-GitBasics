@@ -3,14 +3,33 @@ package com.company;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 
-import static com.company.Equation.equation;
 
-public class Interactive {
+public class Interactive implements Callable {
 
     private static boolean isCorrect = false;
+    private static Interactive instance;
+    private final Equation equation = Equation.getInstance();
 
-    public static List<Double> getDecision() throws IOException{
+    public static synchronized Interactive getInstance() {
+        if (instance == null) {
+            instance = new Interactive();
+        }
+        return instance;
+    }
+
+    private Interactive(){
+
+    }
+
+    @Override
+    public Object call() throws Exception {
+        return getDecision();
+    }
+
+
+    private List<Double> getDecision() throws IOException {
         Double a, b, c = null;
         Scanner scanner = new Scanner(System.in);
         System.out.print("a = ");
@@ -22,7 +41,9 @@ public class Interactive {
         System.out.print("c = ");
         c = inputArg();
         System.out.printf("Equation is: (%f)x^2 + (%f) x + (%f) = 0%n", a, b, c);
-        return equation(a,b,c);
+        synchronized (equation) {
+            return equation.equation(a, b, c);
+        }
     }
 
     private static double inputArg() throws IOException {
@@ -31,7 +52,7 @@ public class Interactive {
         while (!isCorrect) {
             String input = scanner.nextLine();
             Double temp = parseToDouble(input);
-            if(isCorrect){
+            if (isCorrect) {
                 arg = temp;
                 isCorrect = false;
                 return arg;
@@ -43,14 +64,16 @@ public class Interactive {
         throw new IOException("Error. Expected a valid real number");
     }
 
-    private static double parseToDouble(String line){
+    private static double parseToDouble(String line) {
         double result = 0;
         try {
             result = Double.parseDouble(line);
             isCorrect = true;
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             isCorrect = false;
         }
         return result;
     }
+
+
 }

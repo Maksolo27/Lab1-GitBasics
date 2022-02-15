@@ -1,27 +1,46 @@
 package com.company;
 
-
-
 import java.io.*;
 import java.util.List;
-
-import static com.company.Equation.equation;
-
-public class NonInteractive {
+import java.util.concurrent.Callable;
 
 
-    public static List<Double> getDecision(String filePath) throws IOException {
-        double a,b,c;
+public class NonInteractive implements Callable {
+
+    private final String filePath;
+    private static NonInteractive instance;
+    private final Equation equation = Equation.getInstance();
+
+    public static synchronized NonInteractive getInstance(String filePath) {
+        if (instance == null) {
+            instance = new NonInteractive(filePath);
+        }
+        return instance;
+    }
+
+    private NonInteractive(String filePath) {
+        this.filePath = filePath;
+    }
+
+    @Override
+    public Object call() throws Exception {
+        return getDecision();
+    }
+
+    private List<Double> getDecision() throws IOException {
+        double a, b, c;
         String arguments = readFromInputStream(filePath);
         int indexOfFirstSpace = arguments.indexOf(" ");
         a = Double.parseDouble(arguments.substring(0, indexOfFirstSpace));
         int indexOfSecondSpace = arguments.lastIndexOf(" ");
         b = Double.parseDouble(arguments.substring(indexOfFirstSpace, indexOfSecondSpace));
         c = Double.parseDouble(arguments.substring(indexOfSecondSpace, arguments.indexOf("\n")));
-        return equation(a, b, c);
+        synchronized (equation) {
+            return equation.equation(a, b, c);
+        }
     }
 
-    private static String readFromInputStream(String filePath) throws IOException {
+    private String readFromInputStream(String filePath) throws IOException {
         File file = new File(filePath);
         InputStream inputStream = new FileInputStream(file);
         StringBuilder resultStringBuilder = new StringBuilder();
@@ -33,4 +52,6 @@ public class NonInteractive {
         }
         return resultStringBuilder.toString();
     }
+
+
 }

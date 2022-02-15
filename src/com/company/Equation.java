@@ -5,7 +5,20 @@ import java.util.List;
 
 public class Equation {
 
-    public static List<Double> equation(double a, double b, double c){
+    private static Equation instance;
+
+    public static synchronized Equation getInstance() {
+        if (instance == null) {
+            instance = new Equation();
+        }
+        return instance;
+    }
+
+    private Equation() {
+
+    }
+
+    public List<Double> equation(double a, double b, double c) {
         List<Double> results = new ArrayList<>();
         double discriminant = b * b - 4 * a * c;
         if (discriminant > 0) {
@@ -15,14 +28,12 @@ public class Equation {
             results.add(x1);
             results.add(x2);
             return results;
-        }
-        else if (discriminant == 0) {
+        } else if (discriminant == 0) {
             double x;
             x = -b / (2 * a);
             results.add(x);
             return results;
-        }
-        else {
+        } else {
             return results;
         }
     }
